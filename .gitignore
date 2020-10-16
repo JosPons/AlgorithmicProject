@@ -34,3 +34,5 @@ cmake-build-debug/AlgorithmicProject.exe
 cmake-build-debug/CMakeFiles/AlgorithmicProject.dir/C.includecache
 cmake-build-debug/CMakeFiles/AlgorithmicProject.dir/depend.internal
 cmake-build-debug/CMakeFiles/AlgorithmicProject.dir/main.c.o
+*.o
+*.xml
