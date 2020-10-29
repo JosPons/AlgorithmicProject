@@ -17,11 +17,17 @@ void initializeCmdLineParametersLSH(int argc, char **argv,
    * -R <radius>
    */
 
-  if (argc != 15)
+  if (argc < 7 || argc > 15)
   {
-    printf("Expected number of arguments is 15\n");
+    printf("Expected number of arguments is between 7 and 15\n");
     exit(1);
   }
+
+  /* Default Values */
+  cmdLineParametersLSH->k = 4;
+  cmdLineParametersLSH->L = 5;
+  cmdLineParametersLSH->N = 1;
+  cmdLineParametersLSH->R = 10000.00;
 
   for (int i = 1; i < argc; i += 2)
   {
@@ -63,11 +69,18 @@ void initializeCmdLineParametersCube(int argc, char **argv,
    * -R <radius>
    */
 
-  if (argc != 17)
+  if (argc < 7 || argc > 17)
   {
-    printf("Expected number of arguments is 17\n");
+    printf("Expected number of arguments is between 7 and 17\n");
     exit(1);
   }
+
+  /* Default Values */
+  cmdLineParametersCube->k = 14;
+  cmdLineParametersCube->M = 10;
+  cmdLineParametersCube->probes = 2;
+  cmdLineParametersCube->N = 1;
+  cmdLineParametersCube->R = 10000.00;
 
   for (int i = 1; i < argc; i += 2)
   {

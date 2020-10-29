@@ -4,7 +4,7 @@
 #include "utilityFunctions.h"
 
 
-FILE *OpenInitializationDataset(char *path)
+FILE *openInputDataset(char *path)
 {
   FILE *fd;
 
@@ -15,13 +15,39 @@ FILE *OpenInitializationDataset(char *path)
     perror("");
     exit(1);
   }
-
   return fd;
 }
 
-void CloseInitializationDataset(char *path, FILE *fd)
+FILE *openQueryDataset(char *path)
 {
+  FILE *fd;
 
+  fd = fopen(path, "rb");
+  if (fd == NULL)
+  {
+    fprintf(stderr, "Error, couldn't open file at \"%s\" : ", path);
+    perror("");
+    exit(1);
+  }
+  return fd;
+}
+
+FILE *openOutputFile(char *path)
+{
+  FILE *fd;
+
+  fd = fopen(path, "w");
+  if (fd == NULL)
+  {
+    fprintf(stderr, "Error, couldn't open file at \"%s\" : ", path);
+    perror("");
+    exit(1);
+  }
+  return fd;
+}
+
+void closeInputDataset(char *path, FILE *fd)
+{
   if (fclose(fd) != 0)
   {
     fprintf(stderr, "Error, couldn't close file at \"%s\" : ", path);
@@ -30,13 +56,38 @@ void CloseInitializationDataset(char *path, FILE *fd)
   }
 }
 
-void StoreInitializationDatasetInMemory(FILE *fd, imageDataset_t *imageDataset)
+void closeQueryDataset(char *path, FILE *fd)
+{
+  if (fclose(fd) != 0)
+  {
+    fprintf(stderr, "Error, couldn't close file at \"%s\" : ", path);
+    perror("");
+    exit(1);
+  }
+}
+
+void closeOutputFile(char *path, FILE *fd)
+{
+  if (fclose(fd) != 0)
+  {
+    fprintf(stderr, "Error, couldn't close file at \"%s\" : ", path);
+    perror("");
+    exit(1);
+  }
+}
+
+void storeInputDatasetInMemory(FILE *fd, imageDataset_t *imageDataset)
 {
   int32_t buffer[4];
 
   fread(buffer, sizeof(buffer), 1, fd);
-  initializeImageDataset(LittleToBigEndian(buffer[0]), LittleToBigEndian(buffer[1]),
-                         LittleToBigEndian(buffer[2]), LittleToBigEndian(buffer[3]),
-                         imageDataset);
+  createImageDataset(littleToBigEndian(buffer[0]), littleToBigEndian(buffer[1]),
+                     littleToBigEndian(buffer[2]), littleToBigEndian(buffer[3]),
+                     imageDataset);
   fread(imageDataset->imagesVectors, sizeof(coordType), imageDataset->numOfPixels, fd);
+}
+
+void deleteInputDatasetFromMemory(imageDataset_t imageDataset)
+{
+  destroyImageDataset(imageDataset);
 }
