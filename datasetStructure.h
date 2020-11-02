@@ -1,6 +1,7 @@
 #ifndef ALGORITHMICPROJECT_DATASETSTRUCTURE_H
 #define ALGORITHMICPROJECT_DATASETSTRUCTURE_H
 
+#include <stdint.h>
 
 typedef uint8_t coordType;
 

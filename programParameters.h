@@ -2,6 +2,7 @@
 #define ALGORITHMICPROJECT_PROGRAMPARAMETERS_H
 
 #include <stdio.h>
+#include <stdint.h>
 
 typedef struct cmdLineParametersLSH_t
 {

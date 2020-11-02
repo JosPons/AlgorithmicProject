@@ -48,31 +48,93 @@ void destroyHashTable(hashTable_t hashTable)
   destroyHashFunctionFamilyH(hashTable.hashFunctionsFamilyH);
 }
 
-void insertHashTable(hashTable_t *hashTable, const coordType *imageVector)
+void insertHashTableLSH(hashTable_t hashTable, const coordType *imageVector, uint32_t imageVectorId)
 {
   uint32_t hashValue;
   uint32_t hashKey;
   uint32_t freeBucketIndex;
 
-
-  hashValue = hashFunctionG(hashTable->hashFunctionsFamilyH, imageVector);
-  hashKey = hashValue % hashTable->hashTableSize;
-  freeBucketIndex = hashTable->hashTableArray[hashKey].freeBucketIndex;
-  if (hashTable->hashTableArray[hashKey].bucketElements == hashTable->hashTableArray[hashKey].bucketSize)
-    resizeHashTableBucket(&hashTable->hashTableArray[hashKey]);
-  hashTable->hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].imageVector =
-      calloc(hashTable->hashFunctionsFamilyH.vectorDimension, sizeof(coordType));
-  if (hashTable->hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].imageVector == NULL)
+  hashValue = hashFunctionGLSH(hashTable.hashFunctionsFamilyH, imageVector);
+  hashKey = hashValue % hashTable.hashTableSize;
+  freeBucketIndex = hashTable.hashTableArray[hashKey].freeBucketIndex;
+  if (hashTable.hashTableArray[hashKey].bucketElements == hashTable.hashTableArray[hashKey].bucketSize)
+    resizeHashTableBucket(&hashTable.hashTableArray[hashKey]);
+  hashTable.hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].imageVector =
+      calloc(hashTable.hashFunctionsFamilyH.vectorDimension, sizeof(coordType));
+  if (hashTable.hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].imageVector == NULL)
   {
     perror("Error, couldn't allocate memory for \"imageVector\" array inside hash table bucket");
     exit(1);
   }
-  memcpy(hashTable->hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].imageVector, imageVector,
-         sizeof(coordType) * hashTable->hashFunctionsFamilyH.vectorDimension);
-  hashTable->hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].hashKeyG = hashValue;
-  hashTable->hashTableArray[hashKey].bucketElements++;
-  hashTable->hashTableArray[hashKey].freeBucketIndex++;
-  hashTable->hashTableElements++;
+  memcpy(hashTable.hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].imageVector, imageVector,
+         sizeof(coordType) * hashTable.hashFunctionsFamilyH.vectorDimension);
+  hashTable.hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].imageVectorId = imageVectorId + 1;
+  hashTable.hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].hashKeyG = hashValue;
+  hashTable.hashTableArray[hashKey].bucketElements++;
+  hashTable.hashTableArray[hashKey].freeBucketIndex++;
+  hashTable.hashTableElements++;
+}
+
+void insertHashTableCube(hashTable_t hashTable, const coordType *imageVector, uint32_t imageVectorId)
+{
+  uint32_t hashKey;
+  uint32_t freeBucketIndex;
+
+  hashKey = hashFunctionGCube(hashTable.hashFunctionsFamilyH, imageVector);
+  freeBucketIndex = hashTable.hashTableArray[hashKey].freeBucketIndex;
+  if (hashTable.hashTableArray[hashKey].bucketElements == hashTable.hashTableArray[hashKey].bucketSize)
+    resizeHashTableBucket(&hashTable.hashTableArray[hashKey]);
+  hashTable.hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].imageVector =
+      calloc(hashTable.hashFunctionsFamilyH.vectorDimension, sizeof(coordType));
+  if (hashTable.hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].imageVector == NULL)
+  {
+    perror("Error, couldn't allocate memory for \"imageVector\" array inside hash table bucket");
+    exit(1);
+  }
+  memcpy(hashTable.hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].imageVector, imageVector,
+         sizeof(coordType) * hashTable.hashFunctionsFamilyH.vectorDimension);
+  hashTable.hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].imageVectorId = imageVectorId + 1;
+  hashTable.hashTableArray[hashKey].bucketImageVectors[freeBucketIndex].hashKeyG = hashKey;
+  hashTable.hashTableArray[hashKey].bucketElements++;
+  hashTable.hashTableArray[hashKey].freeBucketIndex++;
+  hashTable.hashTableElements++;
+}
+
+uint32_t searchHashTableLSH(hashTable_t hashTable, const coordType *imageVector)
+{
+  return hashFunctionGLSH(hashTable.hashFunctionsFamilyH, imageVector);
+}
+
+uint32_t searchHashTableCube(hashTable_t hashTable, const coordType *imageVector)
+{
+  return hashFunctionGCube(hashTable.hashFunctionsFamilyH, imageVector);
+}
+
+void createArrayOfHashTables(hashTable_t **arrayOfHashTables, uint32_t L, uint32_t hashTableSize,
+                             uint32_t vectorDimension, uint32_t k, uint32_t W)
+{
+  *arrayOfHashTables = calloc(L, sizeof(hashTable_t));
+  if (*arrayOfHashTables == NULL)
+  {
+    perror("Error, couldn't allocate memory for \"arrayOfHashTables\"");
+    exit(1);
+  }
+  for (uint32_t i = 0; i < L; i++)
+    createHashTable(&(*arrayOfHashTables)[i], hashTableSize, vectorDimension, k, W);
+}
+
+void destroyArrayOfHashTables(hashTable_t *arrayOfHashTables, uint32_t L)
+{
+  for (uint32_t i = 0; i < L; i++)
+    destroyHashTable(arrayOfHashTables[i]);
+  free(arrayOfHashTables);
+}
+
+void insertArrayOfHashTable(hashTable_t *arrayOfHashTables, uint32_t L, const coordType *imageVector,
+                            uint32_t imageVectorId)
+{
+  for (uint32_t i = 0; i < L; i++)
+    insertHashTableLSH(arrayOfHashTables[i], imageVector, imageVectorId);
 }
 
 void resizeHashTableBucket(bucket_t *bucket)

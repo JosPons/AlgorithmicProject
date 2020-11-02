@@ -1,19 +1,21 @@
 #ifndef ALGORITHMICPROJECT_HASHTABLE_H
 #define ALGORITHMICPROJECT_HASHTABLE_H
 
+#include <stdint.h>
 #include "programParameters.h"
 #include "datasetStructure.h"
 
-
 //**************************************************************************************//
-typedef struct randomSNumbers_t
+
+typedef struct hashFunctionProperties_t
 {
   double *randomSArray;
-} randomSNumbers_t;
+  int32_t *randomBitNumbersMap;
+} hashFunctionProperties_t;
 
 typedef struct hashFunctionsFamilyH_t
 {
-  randomSNumbers_t *hashFunctionsArray;
+  hashFunctionProperties_t *hashFunctionsArray;
   uint32_t vectorDimension;
   uint32_t k;
   uint32_t W;
@@ -25,6 +27,7 @@ typedef struct hashFunctionsFamilyH_t
 typedef struct bucketElement_t
 {
   coordType *imageVector;
+  uint32_t imageVectorId;
   uint32_t hashKeyG;
 } bucketElement_t;
 
@@ -49,12 +52,20 @@ void destroyHashFunctionFamilyH(hashFunctionsFamilyH_t);
 void generateSi(hashFunctionsFamilyH_t);
 void calculateAi(hashFunctionsFamilyH_t, uint32_t, const coordType *, int32_t *);
 uint32_t calculateHi(hashFunctionsFamilyH_t, const coordType *);
-uint32_t hashFunctionG(hashFunctionsFamilyH_t, const coordType *);
+uint32_t calculateFi(hashFunctionsFamilyH_t, const coordType *);
+uint32_t hashFunctionGLSH(hashFunctionsFamilyH_t, const coordType *);
+uint32_t hashFunctionGCube(hashFunctionsFamilyH_t, const coordType *);
 //**************************************************************************************//
 void createHashTable(hashTable_t *, uint32_t, uint32_t, uint32_t, uint32_t);
 void destroyHashTable(hashTable_t);
+void insertHashTableLSH(hashTable_t, const coordType *, uint32_t);
+void insertHashTableCube(hashTable_t, const coordType *, uint32_t);
+uint32_t searchHashTableLSH(hashTable_t, const coordType *);
+uint32_t searchHashTableCube(hashTable_t, const coordType *);
+void createArrayOfHashTables(hashTable_t **, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
+void destroyArrayOfHashTables(hashTable_t *, uint32_t);
+void insertArrayOfHashTable(hashTable_t *, uint32_t, const coordType *, uint32_t);
 void resizeHashTableBucket(bucket_t *);
-void insertHashTable(hashTable_t *, const coordType *);
 void printHashTable(hashTable_t, FILE *);
 void printHashFunctionFamilyH(hashTable_t, FILE *);
 //**************************************************************************************//

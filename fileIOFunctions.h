@@ -11,5 +11,7 @@ void closeQueryDataset(char *, FILE *);
 void closeOutputFile(char *, FILE *);
 void storeInputDatasetInMemory(FILE *, imageDataset_t *);
 void deleteInputDatasetFromMemory(imageDataset_t);
+void storeQueryDatasetInMemory(FILE *, imageDataset_t *);
+void deleteQueryDatasetFromMemory(imageDataset_t);
 
 #endif //ALGORITHMICPROJECT_FILEIOFUNCTIONS_H
